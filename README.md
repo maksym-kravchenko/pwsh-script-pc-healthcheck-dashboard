@@ -148,7 +148,7 @@ The script requires no elevated privileges for core metrics. The only exception 
 ### Project Structure
 
 ```
-GamingDashboard.ps1    # Entry point — loads WPF assemblies, dot-sources modules in order
+GamingDashboard.ps1    # Entry point - loads WPF assemblies, dot-sources modules in order
 README.md
 src/
 ├── MainWindow.xaml    # WPF layout (pure XAML)
