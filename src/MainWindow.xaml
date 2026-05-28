@@ -1,0 +1,327 @@
+<Window
+    xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+    xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+    Title="PC Gaming Dashboard"
+    Height="700" Width="1040"
+    Background="#0d1117"
+    WindowStyle="SingleBorderWindow"
+    ResizeMode="CanMinimize"
+    TextOptions.TextFormattingMode="Display"
+    TextOptions.TextRenderingMode="ClearType"
+    UseLayoutRounding="True">
+
+  <Grid x:Name="rootGrid" Margin="10">
+    <Grid.RowDefinitions>
+      <RowDefinition Height="50"/>
+      <RowDefinition Height="*"/>
+      <RowDefinition Height="*"/>
+      <RowDefinition Height="40"/>
+    </Grid.RowDefinitions>
+
+    <!-- ===== TITLE BAR ===== -->
+    <Grid x:Name="gridTitle" Grid.Row="0" Background="#0d1117">
+      <StackPanel Orientation="Horizontal" VerticalAlignment="Center">
+        <TextBlock x:Name="txtTitle"
+                   Text="  GAMING PC DASHBOARD  |  v1.2"
+                   Foreground="#a9dc76"
+                   FontFamily="Consolas" FontSize="17" FontWeight="Bold"/>
+      </StackPanel>
+      <StackPanel Orientation="Horizontal" HorizontalAlignment="Right"
+                  VerticalAlignment="Center">
+        <TextBlock x:Name="txtClock"
+                   Text="00:00:00"
+                   Foreground="#6a6a6a"
+                   FontFamily="Consolas" FontSize="15"
+                   VerticalAlignment="Center" Margin="0,0,14,0"/>
+        <Button x:Name="btnTheme"
+                Content="THEME: DARK"
+                Background="#21262d" Foreground="#f0b03c"
+                BorderBrush="#30363d" BorderThickness="1"
+                FontFamily="Consolas" FontSize="10" FontWeight="Bold"
+                Padding="12,5" Cursor="Hand">
+          <Button.Template>
+            <ControlTemplate TargetType="Button">
+              <Border Background="{TemplateBinding Background}"
+                      BorderBrush="{TemplateBinding BorderBrush}"
+                      BorderThickness="{TemplateBinding BorderThickness}"
+                      CornerRadius="6"
+                      Padding="{TemplateBinding Padding}">
+                <ContentPresenter HorizontalAlignment="Center"
+                                  VerticalAlignment="Center"/>
+              </Border>
+            </ControlTemplate>
+          </Button.Template>
+        </Button>
+      </StackPanel>
+    </Grid>
+
+    <!-- ===== TOP ROW: CPU | RAM | GPU ===== -->
+    <Grid Grid.Row="1" Margin="0,8,0,4">
+      <Grid.ColumnDefinitions>
+        <ColumnDefinition Width="*"/>
+        <ColumnDefinition Width="*"/>
+        <ColumnDefinition Width="*"/>
+      </Grid.ColumnDefinitions>
+
+      <!-- CPU CARD -->
+      <Border x:Name="borderCpu" Grid.Column="0"
+              Background="#252526" BorderBrush="#a9dc76"
+              BorderThickness="1" Margin="6" CornerRadius="8">
+        <StackPanel Margin="14,12">
+          <TextBlock x:Name="hdrCpu" Text="[ CPU ]"
+                     Foreground="#a9dc76"
+                     FontFamily="Consolas" FontSize="13" FontWeight="Bold"/>
+          <TextBlock x:Name="txtCpuPct"
+                     Text="0%" Foreground="#a9dc76"
+                     FontFamily="Consolas" FontSize="48" FontWeight="Bold"
+                     HorizontalAlignment="Center" Margin="0,4,0,4"/>
+          <ProgressBar x:Name="pbCpu"
+                       Minimum="0" Maximum="100" Value="0"
+                       Height="12" Foreground="#a9dc76" Background="#333333"
+                       Margin="0,0,0,8"/>
+          <StackPanel Orientation="Horizontal">
+            <TextBlock x:Name="lblCpuTemp" Text="TEMP: "
+                       Foreground="#5a5a5a"
+                       FontFamily="Consolas" FontSize="11"/>
+            <TextBlock x:Name="txtCpuTemp" Text="-- C"
+                       Foreground="#ffd866"
+                       FontFamily="Consolas" FontSize="11" FontWeight="Bold"/>
+          </StackPanel>
+          <TextBlock x:Name="txtCpuName" Text="Loading..."
+                     Foreground="#3a3a3a"
+                     FontFamily="Consolas" FontSize="9"
+                     TextWrapping="Wrap" Margin="0,6,0,0"/>
+        </StackPanel>
+      </Border>
+
+      <!-- RAM CARD -->
+      <Border x:Name="borderRam" Grid.Column="1"
+              Background="#252526" BorderBrush="#78dce8"
+              BorderThickness="1" Margin="6" CornerRadius="8">
+        <StackPanel Margin="14,12">
+          <TextBlock x:Name="hdrRam" Text="[ RAM ]"
+                     Foreground="#78dce8"
+                     FontFamily="Consolas" FontSize="13" FontWeight="Bold"/>
+          <TextBlock x:Name="txtRamPct"
+                     Text="0%" Foreground="#78dce8"
+                     FontFamily="Consolas" FontSize="48" FontWeight="Bold"
+                     HorizontalAlignment="Center" Margin="0,4,0,4"/>
+          <ProgressBar x:Name="pbRam"
+                       Minimum="0" Maximum="100" Value="0"
+                       Height="12" Foreground="#78dce8" Background="#333333"
+                       Margin="0,0,0,8"/>
+          <StackPanel Orientation="Horizontal" HorizontalAlignment="Center">
+            <TextBlock x:Name="txtRamUsed" Text="0 GB"
+                       Foreground="#78dce8"
+                       FontFamily="Consolas" FontSize="13" FontWeight="Bold"/>
+            <TextBlock x:Name="lblRamSlash" Text=" / "
+                       Foreground="#3a3a3a"
+                       FontFamily="Consolas" FontSize="13"/>
+            <TextBlock x:Name="txtRamTotal" Text="0 GB"
+                       Foreground="#3a3a3a"
+                       FontFamily="Consolas" FontSize="13"/>
+          </StackPanel>
+          <TextBlock x:Name="txtRamSpeed" Text="-- MHz"
+                     Foreground="#3a3a3a"
+                     FontFamily="Consolas" FontSize="9"
+                     HorizontalAlignment="Center" Margin="0,6,0,0"/>
+        </StackPanel>
+      </Border>
+
+      <!-- GPU CARD -->
+      <Border x:Name="borderGpu" Grid.Column="2"
+              Background="#252526" BorderBrush="#ff6188"
+              BorderThickness="1" Margin="6" CornerRadius="8">
+        <StackPanel Margin="14,12">
+          <TextBlock x:Name="hdrGpu" Text="[ GPU ]"
+                     Foreground="#ff6188"
+                     FontFamily="Consolas" FontSize="13" FontWeight="Bold"/>
+          <TextBlock x:Name="txtGpuPct"
+                     Text="N/A" Foreground="#ff6188"
+                     FontFamily="Consolas" FontSize="48" FontWeight="Bold"
+                     HorizontalAlignment="Center" Margin="0,4,0,4"/>
+          <ProgressBar x:Name="pbGpu"
+                       Minimum="0" Maximum="100" Value="0"
+                       Height="12" Foreground="#ff6188" Background="#333333"
+                       Margin="0,0,0,8"/>
+          <StackPanel Orientation="Horizontal">
+            <TextBlock x:Name="lblGpuTemp" Text="TEMP: "
+                       Foreground="#5a5a5a"
+                       FontFamily="Consolas" FontSize="11"/>
+            <TextBlock x:Name="txtGpuTemp" Text="-- C"
+                       Foreground="#ffd866"
+                       FontFamily="Consolas" FontSize="11" FontWeight="Bold"/>
+          </StackPanel>
+          <TextBlock x:Name="txtGpuName" Text="Detecting..."
+                     Foreground="#3a3a3a"
+                     FontFamily="Consolas" FontSize="9"
+                     TextWrapping="Wrap" Margin="0,6,0,0"/>
+        </StackPanel>
+      </Border>
+    </Grid>
+
+    <!-- ===== BOTTOM ROW: DISK | WIFI | SYSTEM ===== -->
+    <Grid Grid.Row="2" Margin="0,4,0,8">
+      <Grid.ColumnDefinitions>
+        <ColumnDefinition Width="*"/>
+        <ColumnDefinition Width="*"/>
+        <ColumnDefinition Width="*"/>
+      </Grid.ColumnDefinitions>
+
+      <!-- DISK CARD -->
+      <Border x:Name="borderDisk" Grid.Column="0"
+              Background="#252526" BorderBrush="#ab9df2"
+              BorderThickness="1" Margin="6" CornerRadius="8">
+        <StackPanel Margin="14,12">
+          <TextBlock x:Name="hdrDisk" Text="[ DISK  C:\ ]"
+                     Foreground="#ab9df2"
+                     FontFamily="Consolas" FontSize="13" FontWeight="Bold"/>
+          <TextBlock x:Name="txtDiskPct"
+                     Text="0%" Foreground="#ab9df2"
+                     FontFamily="Consolas" FontSize="48" FontWeight="Bold"
+                     HorizontalAlignment="Center" Margin="0,4,0,4"/>
+          <ProgressBar x:Name="pbDisk"
+                       Minimum="0" Maximum="100" Value="0"
+                       Height="12" Foreground="#ab9df2" Background="#333333"
+                       Margin="0,0,0,8"/>
+          <Grid>
+            <Grid.ColumnDefinitions>
+              <ColumnDefinition/>
+              <ColumnDefinition/>
+            </Grid.ColumnDefinitions>
+            <StackPanel HorizontalAlignment="Center">
+              <TextBlock x:Name="lblDiskUsed" Text="USED"
+                         Foreground="#5a5a5a"
+                         FontFamily="Consolas" FontSize="9"
+                         HorizontalAlignment="Center"/>
+              <TextBlock x:Name="txtDiskUsed" Text="--"
+                         Foreground="#ab9df2"
+                         FontFamily="Consolas" FontSize="13" FontWeight="Bold"
+                         HorizontalAlignment="Center"/>
+            </StackPanel>
+            <StackPanel Grid.Column="1" HorizontalAlignment="Center">
+              <TextBlock x:Name="lblDiskFree" Text="FREE"
+                         Foreground="#5a5a5a"
+                         FontFamily="Consolas" FontSize="9"
+                         HorizontalAlignment="Center"/>
+              <TextBlock x:Name="txtDiskFree" Text="--"
+                         Foreground="#5a5a5a"
+                         FontFamily="Consolas" FontSize="13"
+                         HorizontalAlignment="Center"/>
+            </StackPanel>
+          </Grid>
+        </StackPanel>
+      </Border>
+
+      <!-- WIFI CARD -->
+      <Border x:Name="borderWifi" Grid.Column="1"
+              Background="#252526" BorderBrush="#ffd866"
+              BorderThickness="1" Margin="6" CornerRadius="8">
+        <StackPanel Margin="14,12">
+          <TextBlock x:Name="hdrWifi" Text="[ WI-FI ]"
+                     Foreground="#ffd866"
+                     FontFamily="Consolas" FontSize="13" FontWeight="Bold"/>
+
+          <!-- SSID row -->
+          <StackPanel Orientation="Horizontal" Margin="0,6,0,2">
+            <TextBlock x:Name="lblSsid" Text="SSID   : "
+                       Foreground="#5a5a5a"
+                       FontFamily="Consolas" FontSize="11"/>
+            <TextBlock x:Name="txtSsid" Text="Scanning..."
+                       Foreground="#ffd866"
+                       FontFamily="Consolas" FontSize="11" FontWeight="Bold"/>
+          </StackPanel>
+
+          <!-- Signal row -->
+          <StackPanel Orientation="Horizontal" Margin="0,2,0,4">
+            <TextBlock x:Name="lblSignal" Text="SIGNAL : "
+                       Foreground="#5a5a5a"
+                       FontFamily="Consolas" FontSize="11"/>
+            <TextBlock x:Name="txtSignalPct" Text="-- %"
+                       Foreground="#ffd866"
+                       FontFamily="Consolas" FontSize="11" FontWeight="Bold"/>
+          </StackPanel>
+          <ProgressBar x:Name="pbSignal"
+                       Minimum="0" Maximum="100" Value="0"
+                       Height="10" Foreground="#ffd866" Background="#333333"
+                       Margin="0,0,0,10"/>
+
+          <!-- Speed rows -->
+          <TextBlock x:Name="lblDown" Text="DOWNLOAD"
+                     Foreground="#5a5a5a"
+                     FontFamily="Consolas" FontSize="9"/>
+          <TextBlock x:Name="txtNetDown" Text="0 KB/s"
+                     Foreground="#a9dc76"
+                     FontFamily="Consolas" FontSize="20" FontWeight="Bold"
+                     Margin="0,0,0,6"/>
+          <TextBlock x:Name="lblUp" Text="UPLOAD"
+                     Foreground="#5a5a5a"
+                     FontFamily="Consolas" FontSize="9"/>
+          <TextBlock x:Name="txtNetUp" Text="0 KB/s"
+                     Foreground="#ffd866"
+                     FontFamily="Consolas" FontSize="20" FontWeight="Bold"/>
+        </StackPanel>
+      </Border>
+
+      <!-- SYSTEM INFO CARD -->
+      <Border x:Name="borderSys" Grid.Column="2"
+              Background="#252526" BorderBrush="#fc9867"
+              BorderThickness="1" Margin="6" CornerRadius="8">
+        <StackPanel Margin="14,12">
+          <TextBlock x:Name="hdrSys" Text="[ SYSTEM ]"
+                     Foreground="#fc9867"
+                     FontFamily="Consolas" FontSize="13" FontWeight="Bold"
+                     Margin="0,0,0,10"/>
+          <StackPanel Orientation="Horizontal" Margin="0,3">
+            <TextBlock x:Name="lblUptime" Text="UPTIME  : "
+                       Foreground="#5a5a5a" FontFamily="Consolas" FontSize="11"/>
+            <TextBlock x:Name="txtUptime" Text="--"
+                       Foreground="#fc9867" FontFamily="Consolas" FontSize="11"/>
+          </StackPanel>
+          <StackPanel Orientation="Horizontal" Margin="0,3">
+            <TextBlock x:Name="lblOS" Text="OS      : "
+                       Foreground="#5a5a5a" FontFamily="Consolas" FontSize="11"/>
+            <TextBlock x:Name="txtOS" Text="--"
+                       Foreground="#fc9867" FontFamily="Consolas" FontSize="11"/>
+          </StackPanel>
+          <StackPanel Orientation="Horizontal" Margin="0,3">
+            <TextBlock x:Name="lblHost" Text="HOST    : "
+                       Foreground="#5a5a5a" FontFamily="Consolas" FontSize="11"/>
+            <TextBlock x:Name="txtHost" Text="--"
+                       Foreground="#fc9867" FontFamily="Consolas" FontSize="11"/>
+          </StackPanel>
+          <StackPanel Orientation="Horizontal" Margin="0,3">
+            <TextBlock x:Name="lblFPS" Text="FPS     : "
+                       Foreground="#5a5a5a" FontFamily="Consolas" FontSize="11"/>
+            <TextBlock x:Name="txtFPS" Text="N/A"
+                       Foreground="#ff6188" FontFamily="Consolas" FontSize="11"/>
+          </StackPanel>
+          <StackPanel Orientation="Horizontal" Margin="0,3">
+            <TextBlock x:Name="lblStatus" Text="STATUS  : "
+                       Foreground="#5a5a5a" FontFamily="Consolas" FontSize="11"/>
+            <TextBlock x:Name="txtStatus" Text="LIVE"
+                       Foreground="#a9dc76" FontFamily="Consolas" FontSize="11"/>
+          </StackPanel>
+        </StackPanel>
+      </Border>
+    </Grid>
+
+    <!-- ===== ALERT BAR ===== -->
+    <Grid x:Name="gridAlert" Grid.Row="3" Background="#161b22">
+      <TextBlock x:Name="lblAlerts" Text="  ALERTS: "
+                 Foreground="#ffd866"
+                 FontFamily="Consolas" FontSize="11" FontWeight="Bold"
+                 VerticalAlignment="Center"/>
+      <TextBlock x:Name="txtAlerts" Text="All systems nominal"
+                 Foreground="#a9dc76"
+                 FontFamily="Consolas" FontSize="11"
+                 VerticalAlignment="Center" Margin="70,0,0,0"/>
+      <TextBlock x:Name="txtLastUpdate" Text="Updated: --"
+                 Foreground="#3a3a3a"
+                 FontFamily="Consolas" FontSize="9"
+                 HorizontalAlignment="Right" VerticalAlignment="Center"
+                 Margin="0,0,8,0"/>
+    </Grid>
+
+  </Grid>
+</Window>
