@@ -1,7 +1,8 @@
 # =============================================================================
 #  MONITORS
-#  Hardware and network data collection. No UI dependencies - all functions
-#  return plain values or hashtables; the caller decides how to display them.
+#  Hardware and network data collection. Functions mostly return plain values
+#  or hashtables; the exception is Get-UsageBrush, which maps a percentage to a
+#  themed brush and therefore needs Themes.ps1 loaded first.
 # =============================================================================
 function Format-Bytes {
     param([double]$bytes)
@@ -18,9 +19,8 @@ function Format-Speed {
     return "0 KB/s"
 }
 
-# Returns a theme-aware brush based on utilization percentage.
-# Danger/warning thresholds override the card accent so all cards share consistent
-# color semantics regardless of their individual accent colors.
+# Red past 90%, amber past 70%, otherwise the card's own accent. The shared
+# thresholds win over the accent so every card warns with the same colors.
 function Get-UsageBrush {
     param([int]$pct, [string]$accent)
     if ($pct -ge 90) { return ConvertTo-Brush "#ff6188" }
@@ -32,8 +32,7 @@ function Get-UsageBrush {
 
 $cpuCounter = $null
 try {
-    $cpuCounter = New-Object System.Diagnostics.PerformanceCounter(
-                      "Processor", "% Processor Time", "_Total")
+    $cpuCounter = New-Object System.Diagnostics.PerformanceCounter("Processor", "% Processor Time", "_Total")
     $null = $cpuCounter.NextValue()   # first call always returns 0; discard it
 } catch {
     $cpuCounter = $null
@@ -54,8 +53,8 @@ function Get-CpuPct {
 
 # --- GPU ---------------------------------------------------------------------
 
-# Tracks whether the Windows GPU perf counter WMI class exists on this machine.
-# Set to $false permanently after the first failed query to avoid repeated overhead.
+# The GPU perf-counter WMI class isn't present on every machine. Latch this off
+# after the first failed query so we stop paying for it on each tick.
 $script:gpuEngineAvailable = $true
 
 function Get-GpuInfo {
@@ -104,7 +103,7 @@ function Get-GpuInfo {
                 Select-Object -First 1
         if ($load) {
             return @{
-                Pct  = [int][math]::Round($load.Value)
+                Pct = [int][math]::Round($load.Value)
                 Temp = if ($temp) { [int][math]::Round($temp.Value) } else { $null }
             }
         }
@@ -120,8 +119,8 @@ $script:netshExe = Join-Path $env:SystemRoot "System32\netsh.exe"
 if (-not (Test-Path $script:netshExe)) { $script:netshExe = "netsh.exe" }
 
 function Get-WifiInfo {
-    $ssid    = ""
-    $signal  = 0
+    $ssid = ""
+    $signal = 0
     $hasWifi = $false
 
     try {
@@ -163,7 +162,7 @@ function Get-WifiInfo {
 # --- Network speeds ----------------------------------------------------------
 
 $script:netBaseline = @{}
-$script:netTime     = [DateTime]::Now
+$script:netTime = [DateTime]::Now
 
 function Initialize-Network {
     $adapters = Get-NetAdapterStatistics -ErrorAction SilentlyContinue |
@@ -177,7 +176,7 @@ function Initialize-Network {
 # Returns @{ Rx = bytes/sec; Tx = bytes/sec } by diffing cumulative adapter counters
 # against the previous snapshot and dividing by elapsed seconds.
 function Get-NetworkSpeeds {
-    $now     = [DateTime]::Now
+    $now = [DateTime]::Now
     $elapsed = ($now - $script:netTime).TotalSeconds
     if ($elapsed -lt 0.1) { $elapsed = 1 }   # guard against near-zero delta on first call
 
