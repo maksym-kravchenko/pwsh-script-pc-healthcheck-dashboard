@@ -40,59 +40,25 @@ That's it. The window opens immediately and starts updating.
 
 ### Requirements
 
-| Requirement | Details |
-|---|---|
-| OS | Windows 10 or Windows 11 |
-| PowerShell | 5.1 or newer (built into Windows) |
-| .NET / WPF | Included with Windows - no extra install |
-| GPU temperature | NVIDIA: `nvidia-smi` (included with NVIDIA drivers) |
-| CPU/GPU temperature | Any GPU: [OpenHardwareMonitor](https://openhardwaremonitor.org/) running as administrator |
+- Windows 10 or 11 with PowerShell 5.1+ (both built in - nothing extra to install)
+- Optional, for temperatures only: NVIDIA drivers (`nvidia-smi`) or [OpenHardwareMonitor](https://openhardwaremonitor.org/) run as administrator
 
-### Installation
+### Run it
 
-1. Download or clone this repository
-2. Right-click `GamingDashboard.ps1` → **Run with PowerShell**
+Right-click `GamingDashboard.ps1` → **Run with PowerShell**, or from a terminal:
 
-   Or from a terminal:
-   ```powershell
-   powershell -ExecutionPolicy Bypass -File "C:\path\to\GamingDashboard.ps1"
-   ```
+```powershell
+powershell -ExecutionPolicy Bypass -File GamingDashboard.ps1
+```
 
-3. The dashboard window opens. No further setup needed.
+The window opens and updates every second. No further setup needed.
 
-### Reading the Dashboard
+### Good to know
 
-The window is split into two rows of three cards:
-
-**Top row**
-
-| Card | What it shows |
-|---|---|
-| CPU | Utilization % · Temperature (OHM required) · Processor model |
-| RAM | Usage % · Used / Total GB · Memory speed |
-| GPU | Utilization % · Temperature · GPU model |
-
-**Bottom row**
-
-| Card | What it shows |
-|---|---|
-| DISK | C: drive usage % · Used · Free |
-| WI-FI | Connected SSID · Signal % · Download/Upload speed |
-| SYSTEM | Uptime · OS version · Hostname |
-
-**Progress bars** turn yellow above 70% and red above 90%.
-
-**Alert bar** (bottom strip) shows "All systems nominal" normally, or a warning message listing any metric over its threshold.
-
-### Switching Themes
-
-Click **THEME: DARK** / **THEME: LIGHT** in the top-right corner to toggle between themes.
-
-### GPU Temperature
-
-- **NVIDIA GPUs**: temperature appears automatically if NVIDIA drivers are installed (via `nvidia-smi`)
-- **AMD / Intel GPUs**: install [OpenHardwareMonitor](https://openhardwaremonitor.org/), run it as administrator before launching the dashboard
-- If neither is available, the temperature field shows `-- C`
+- Progress bars turn **yellow above 70%** and **red above 90%**.
+- The alert bar reads "All systems nominal" normally, or lists any metric over its threshold.
+- Click **THEME** in the top-right to switch between Dark and Light.
+- GPU temperature needs NVIDIA drivers or OpenHardwareMonitor; without them the field shows `-- C`.
 
 ---
 
@@ -120,19 +86,9 @@ Set-ExecutionPolicy -Scope CurrentUser RemoteSigned
    powershell.exe -ExecutionPolicy Bypass -WindowStyle Hidden -File "C:\path\to\GamingDashboard.ps1"
    ```
 
-### GPU Temperature with OpenHardwareMonitor
-
-OpenHardwareMonitor (OHM) exposes a WMI namespace (`root/OpenHardwareMonitor`) that the dashboard reads. OHM must be running with administrator rights before the dashboard starts. The dashboard queries it every 3 seconds to keep WMI load low.
-
 ### Permissions
 
 The script requires no elevated privileges for core metrics. The only exception is OpenHardwareMonitor itself, which must run as administrator to access hardware sensors - the dashboard just reads the WMI data OHM exposes.
-
-### Deployment / Maintenance
-
-- The entire application is one file - copy `GamingDashboard.ps1` to deploy
-- No registry keys, no scheduled tasks, no installed files
-- To update: replace the `.ps1` file
 
 ### Security Considerations
 
@@ -148,28 +104,35 @@ The script requires no elevated privileges for core metrics. The only exception 
 ### Project Structure
 
 ```
-GamingDashboard.ps1    # Entry point - loads WPF assemblies, dot-sources modules in order
+GamingDashboard.ps1    # Entry point - loads WPF assemblies, dot-sources the modules in order
+pap.svg                # Program flow chart (PAP) of the update loop and data sources
 README.md
 src/
 ├── MainWindow.xaml    # WPF layout (pure XAML)
-├── Themes.ps1         # Color palettes, ConvertTo-Brush, Apply-Theme
-├── Monitors.ps1       # Hardware/network data collection (no UI dependencies)
-└── Dashboard.ps1      # Window loading, control binding, update loop, events
+├── Themes.ps1         # Color palettes, brush cache, Apply-Theme
+├── Monitors.ps1       # Hardware / network data collection (no UI dependencies)
+└── Dashboard.ps1      # Window load, control binding, 1-second update loop, events
 ```
+
+The entry point dot-sources the modules in dependency order: `Themes.ps1` → `Monitors.ps1` → `Dashboard.ps1`. `Monitors.ps1` depends on `Themes.ps1` (`Get-UsageBrush` uses `ConvertTo-Brush`), and `Dashboard.ps1` wires the loaded UI to both.
+
+### Program Flow
+
+See [`pap.svg`](pap.svg) for a full flow chart of startup, the 1-second update loop, and where each metric comes from.
 
 ### Development Setup
 
-No build step required. Edit the file in any editor and run directly:
+No build step required. Edit any file and run directly:
 
 ```powershell
 powershell -ExecutionPolicy Bypass -File GamingDashboard.ps1
 ```
 
-PowerShell ISE or VS Code with the PowerShell extension both provide syntax highlighting and debugging.
+VS Code with the PowerShell extension (or PowerShell ISE) gives syntax highlighting and debugging.
 
 ### Tick-Rate Throttling
 
-`Update-Dashboard` runs every second but not every metric needs 1-second resolution:
+`Update-Dashboard` runs every second, but not every metric needs 1-second resolution:
 
 | Cadence | Metrics |
 |---|---|
@@ -182,44 +145,11 @@ This keeps WMI load low while keeping fast-changing metrics responsive.
 
 ### Adding a Theme
 
-Add a new entry to `$script:themes` following the existing pattern:
-
-```powershell
-"MYTHEME" = @{
-    WinBg       = "#..."   # window background
-    CardBg      = "#..."   # card background
-    TitleBg     = "#..."   # title bar background
-    AlertBg     = "#..."   # alert bar background
-    PbBg        = "#..."   # progress bar track
-
-    CpuAccent   = "#..."   # CPU card accent (border, header, value text)
-    RamAccent   = "#..."
-    GpuAccent   = "#..."
-    DiskAccent  = "#..."
-    WifiAccent  = "#..."
-    SysAccent   = "#..."
-
-    TitleText   = "#..."   # dashboard title
-    ClockText   = "#..."   # clock
-    TempText    = "#..."   # temperature values
-    DimText     = "#..."   # secondary labels
-    MidText     = "#..."   # tertiary values (total RAM, free disk, etc.)
-    AlertLabel  = "#..."   # "ALERTS:" label
-    AlertOk     = "#..."   # nominal state message
-    AlertWarn   = "#..."   # warning state message
-    NetDownText = "#..."
-    NetUpText   = "#..."
-    ThemeBtnBg  = "#..."
-    ThemeBtnFg  = "#..."
-    ThemeBtnBdr = "#..."
-}
-```
-
-Then update the toggle in `$btnTheme.Add_Click` in `src/Dashboard.ps1` to cycle through your theme list.
+Add a new entry to `$script:themes` in `src/Themes.ps1`, following the existing `DARK`/`LIGHT` blocks (every color key must be present). Then extend the toggle in `$btnTheme.Add_Click` in `src/Dashboard.ps1` to cycle through your theme list.
 
 ### Brush Caching
 
-`ConvertTo-Brush` (in `src/Themes.ps1`) caches and freezes every `SolidColorBrush` it creates. Frozen brushes are immutable and thread-safe; WPF skips layout invalidation when assigning them. This matters on a 1-second timer touching 30+ UI elements per tick.
+`ConvertTo-Brush` (in `src/Themes.ps1`) caches and freezes every `SolidColorBrush` it creates. Frozen brushes are immutable and thread-safe, and WPF skips change tracking when assigning them - which matters on a 1-second timer touching 30+ UI elements per tick.
 
 ### Contributing
 
